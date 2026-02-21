@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Career Evolution Elite</title>
+<style>
+body{
+  margin:0;
+  font-family:Segoe UI;
+  background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  color:white;
+}
+header{
+  padding:20px;
+  font-size:28px;
+  font-weight:bold;
+  text-align:center;
+  background:#111;
+  box-shadow:0 0 20px #00ffff55;
+}
+.container{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:20px;
+  padding:20px;
+}
+.card{
+  background:rgba(0,0,0,0.6);
+  border-radius:15px;
+  padding:20px;
+  box-shadow:0 0 15px #00ffff33;
+}
+button{
+  padding:8px 14px;
+  margin:5px;
+  border:none;
+  border-radius:8px;
+  background:#00ffff;
+  font-weight:bold;
+  cursor:pointer;
+}
+button:hover{
+  background:#00bfff;
+}
+.progress{
+  height:12px;
+  background:#333;
+  border-radius:8px;
+  overflow:hidden;
+}
+.bar{
+  height:100%;
+  background:lime;
+}
+.news{
+  font-size:13px;
+  background:#111;
+  padding:6px;
+  border-radius:6px;
+  margin-top:5px;
+}
+</style>
+</head>
+<body>
+
+<header>⚽ Career Evolution – Elite Edition</header>
+
+<div class="container">
+<div class="card" id="player"></div>
+<div class="card" id="finance"></div>
+<div class="card" id="news"></div>
+<div class="card" id="market"></div>
+<div class="card">
+<button onclick="simTemporada()">Simular Temporada</button>
+<button onclick="abrirMercado()">Abrir Mercado</button>
+<button onclick="treinar()">Treinar</button>
+<button onclick="vidaLuxo()">Vida Pessoal</button>
+</div>
+</div>
+
+<script>
+
+// ========================
+// JOGADOR
+// ========================
+
+let jogador={
+nome:"Théo Leme",
+idade:17,
+overall:71,
+potencial:92,
+valor:9000000,
+salario:20000,
+dinheiro:50000,
+moral:80,
+forma:75,
+clube:"Base Brasil",
+titulos:0,
+champions:0,
+bolaOuro:0,
+personalidade:"Ambicioso"
+}
+
+// ========================
+// UTIL
+// ========================
+
+function r(min,max){return Math.floor(Math.random()*(max-min)+min)}
+
+function atualizar(){
+
+document.getElementById("player").innerHTML=`
+<h2>${jogador.nome}</h2>
+<p>Clube: ${jogador.clube}</p>
+<p>Idade: ${jogador.idade}</p>
+<p>Overall: ${jogador.overall}</p>
+<div class="progress"><div class="bar" style="width:${jogador.overall}%"></div></div>
+<p>Moral: ${jogador.moral}</p>
+<p>Forma: ${jogador.forma}</p>
+<p>Personalidade: ${jogador.personalidade}</p>
+<p>Títulos Liga: ${jogador.titulos}</p>
+<p>Champions: ${jogador.champions}</p>
+<p>Bola de Ouro: ${jogador.bolaOuro}</p>
+`
+
+document.getElementById("finance").innerHTML=`
+<h3>💰 Finanças</h3>
+<p>Salário semanal: €${jogador.salario.toLocaleString()}</p>
+<p>Dinheiro acumulado: €${jogador.dinheiro.toLocaleString()}</p>
+<p>Valor de mercado: €${jogador.valor.toLocaleString()}</p>
+`
+
+}
+
+function noticia(t){
+document.getElementById("news").innerHTML=
+`<h3>📰 Mídia</h3><div class="news">${t}</div>`
+}
+
+// ========================
+// TEMPORADA
+// ========================
+
+function simTemporada(){
+
+let gols=r(5,35)
+let assist=r(3,20)
+
+if(Math.random()<0.15){
+jogador.champions++
+noticia("🏆 Campeão da Champions League!")
+}
+
+if(gols>25){
+jogador.bolaOuro++
+noticia("🌟 Vence a Bola de Ouro!")
+}
+
+if(gols>18){
+jogador.titulos++
+}
+
+jogador.dinheiro+=jogador.salario*52
+jogador.valor+=gols*400000
+jogador.overall+=r(0,2)
+if(jogador.overall>jogador.potencial)jogador.overall=jogador.potencial
+
+jogador.idade++
+jogador.forma=r(70,95)
+
+alert(`Temporada Finalizada
+Gols: ${gols}
+Assistências: ${assist}`)
+
+atualizar()
+}
+
+// ========================
+// MERCADO COM LEILÃO
+// ========================
+
+function abrirMercado(){
+
+let clubes=["Real Madrid","Manchester City","PSG","Bayern","Barcelona","Al Hilal"]
+clubes.sort(()=>0.5-Math.random())
+
+let html="<h3>💰 Leilão</h3>"
+
+clubes.slice(0,3).forEach(c=>{
+let oferta=jogador.valor*(1+Math.random()*0.5)
+html+=`
+<div class="news">
+<b>${c}</b><br>
+Oferta: €${Math.floor(oferta).toLocaleString()}
+<br>
+<button onclick="aceitar('${c}',${Math.floor(oferta)})">Aceitar</button>
+</div>`
+})
+
+document.getElementById("market").innerHTML=html
+}
+
+function aceitar(c,v){
+jogador.clube=c
+jogador.valor=v
+jogador.salario+=10000
+noticia(`${c} anuncia ${jogador.nome} por €${v.toLocaleString()}!`)
+atualizar()
+document.getElementById("market").innerHTML=""
+}
+
+// ========================
+// TREINO
+// ========================
+
+function treinar(){
+jogador.overall+=1
+jogador.forma+=5
+jogador.moral+=3
+noticia("Treino pesado aumenta desempenho.")
+atualizar()
+}
+
+// ========================
+// VIDA PESSOAL
+// ========================
+
+function vidaLuxo(){
+
+if(jogador.dinheiro>1000000){
+jogador.dinheiro-=1000000
+noticia("🏎 Compra uma Lamborghini e aumenta moral!")
+jogador.moral+=10
+}else{
+noticia("Dinheiro insuficiente para luxo.")
+}
+
+atualizar()
+}
+
+atualizar()
+
+</script>
+</body>
+</html>
