@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Career Dynasty</title>
+<style>
+body{
+margin:0;
+font-family:Segoe UI;
+background:linear-gradient(135deg,#0f0f1a,#1a1a2e,#16213e);
+color:white;
+}
+
+header{
+background:#000;
+padding:20px;
+text-align:center;
+font-size:28px;
+box-shadow:0 0 20px #00ffff55;
+}
+
+.container{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+gap:20px;
+padding:20px;
+}
+
+.card{
+background:rgba(0,0,0,0.7);
+padding:20px;
+border-radius:15px;
+box-shadow:0 0 15px #00ffff33;
+}
+
+button{
+padding:8px 15px;
+margin:5px;
+border:none;
+border-radius:8px;
+background:#00ffff;
+cursor:pointer;
+font-weight:bold;
+}
+
+button:hover{
+background:#00bfff;
+}
+
+.progress{
+height:12px;
+background:#333;
+border-radius:8px;
+overflow:hidden;
+}
+
+.bar{
+height:100%;
+background:lime;
+}
+
+.news{
+background:#111;
+padding:6px;
+margin-top:5px;
+border-radius:6px;
+font-size:13px;
+}
+</style>
+</head>
+<body>
+
+<header>⚽ Career Dynasty – Ultimate</header>
+
+<div class="container">
+
+<div class="card" id="player"></div>
+<div class="card" id="finance"></div>
+<div class="card" id="trophies"></div>
+<div class="card" id="media"></div>
+<div class="card" id="market"></div>
+
+<div class="card">
+<button onclick="simSeason()">Simular Temporada</button>
+<button onclick="openMarket()">Abrir Mercado</button>
+<button onclick="train()">Treinar</button>
+<button onclick="luxury()">Vida de Luxo</button>
+<button onclick="worldCup()">Copa do Mundo</button>
+</div>
+
+</div>
+
+<script>
+
+// =====================
+// PLAYER
+// =====================
+
+let player={
+name:"Théo Leme",
+age:17,
+overall:72,
+potential:93,
+value:10000000,
+salary:25000,
+money:80000,
+morale:80,
+form:75,
+club:"Base Brasil",
+leagueTitles:0,
+champions:0,
+worldCups:0,
+ballonDor:0,
+injured:false,
+legacy:0,
+agentCommission:0.1
+}
+
+// =====================
+// UTILS
+// =====================
+
+function r(min,max){return Math.floor(Math.random()*(max-min)+min)}
+
+function updateUI(){
+
+document.getElementById("player").innerHTML=`
+<h2>${player.name}</h2>
+<p>Clube: ${player.club}</p>
+<p>Idade: ${player.age}</p>
+<p>Overall: ${player.overall}</p>
+<div class="progress"><div class="bar" style="width:${player.overall}%"></div></div>
+<p>Moral: ${player.morale}</p>
+<p>Forma: ${player.form}</p>
+<p>Status: ${player.injured?"🤕 Lesionado":"✅ Saudável"}</p>
+`
+
+document.getElementById("finance").innerHTML=`
+<h3>💰 Finanças</h3>
+<p>Salário semanal: €${player.salary.toLocaleString()}</p>
+<p>Dinheiro: €${player.money.toLocaleString()}</p>
+<p>Valor de mercado: €${player.value.toLocaleString()}</p>
+`
+
+document.getElementById("trophies").innerHTML=`
+<h3>🏆 Conquistas</h3>
+<p>Ligas: ${player.leagueTitles}</p>
+<p>Champions: ${player.champions}</p>
+<p>Copas do Mundo: ${player.worldCups}</p>
+<p>Bola de Ouro: ${player.ballonDor}</p>
+<p>Legado: ${player.legacy}</p>
+`
+}
+
+// =====================
+// MEDIA
+// =====================
+
+function media(msg){
+document.getElementById("media").innerHTML=
+`<h3>📰 Mídia</h3><div class="news">${msg}</div>`
+}
+
+// =====================
+// SEASON
+// =====================
+
+function simSeason(){
+
+if(player.injured){
+media("Temporada prejudicada por lesão.")
+player.injured=false
+return
+}
+
+let goals=r(5,35)
+
+if(Math.random()<0.2){
+player.champions++
+media("🏆 Campeão da Champions League!")
+}
+
+if(goals>25){
+player.ballonDor++
+media("🌟 Vence a Bola de Ouro!")
+}
+
+if(goals>18){
+player.leagueTitles++
+}
+
+if(Math.random()<0.15){
+player.injured=true
+media("🤕 Sofre lesão grave!")
+}
+
+player.money+=player.salary*52
+player.value+=goals*500000
+player.overall+=r(0,2)
+if(player.overall>player.potential)player.overall=player.potential
+
+player.age++
+player.legacy+=2
+
+alert(`Temporada Finalizada
+Gols: ${goals}`)
+
+updateUI()
+}
+
+// =====================
+// MARKET
+// =====================
+
+function openMarket(){
+
+let clubs=["Real Madrid","Man City","PSG","Bayern","Barcelona","Al Hilal","Inter","Liverpool"]
+clubs.sort(()=>0.5-Math.random())
+
+let html="<h3>💰 Mercado</h3>"
+
+clubs.slice(0,3).forEach(c=>{
+let offer=Math.floor(player.value*(1+Math.random()*0.5))
+html+=`
+<div class="news">
+<b>${c}</b><br>
+Oferta: €${offer.toLocaleString()}
+<br>
+<button onclick="accept('${c}',${offer})">Aceitar</button>
+</div>`
+})
+
+document.getElementById("market").innerHTML=html
+}
+
+function accept(club,offer){
+
+let agentCut=offer*player.agentCommission
+player.money+=offer-agentCut
+player.club=club
+player.salary+=15000
+player.value=offer
+
+media(`${club} contrata ${player.name} por €${offer.toLocaleString()}! Empresário recebe €${agentCut.toLocaleString()}.`)
+updateUI()
+document.getElementById("market").innerHTML=""
+}
+
+// =====================
+// TRAIN
+// =====================
+
+function train(){
+player.overall+=1
+player.morale+=5
+player.form+=5
+player.legacy+=1
+media("Treino intenso melhora atributos.")
+updateUI()
+}
+
+// =====================
+// LUXURY
+// =====================
+
+function luxury(){
+if(player.money>2000000){
+player.money-=2000000
+player.morale+=10
+media("🏎 Compra carro de luxo e aumenta moral!")
+}else{
+media("Dinheiro insuficiente.")
+}
+updateUI()
+}
+
+// =====================
+// WORLD CUP
+// =====================
+
+function worldCup(){
+if(Math.random()<0.3){
+player.worldCups++
+player.legacy+=10
+media("🇧🇷 Campeão da Copa do Mundo!")
+}else{
+media("Brasil eliminado na Copa.")
+}
+updateUI()
+}
+
+updateUI()
+
+</script>
+</body>
+</html>
