@@ -1,18 +1,37 @@
+// =============================
+// BASE DE DADOS DE CLUBES
+// =============================
+
+const clubes = [
+  { nome: "Flamengo", liga: "Brasil", forca: 85 },
+  { nome: "Palmeiras", liga: "Brasil", forca: 84 },
+  { nome: "São Paulo", liga: "Brasil", forca: 78 },
+  { nome: "Real Madrid", liga: "Europa", forca: 95 },
+  { nome: "Barcelona", liga: "Europa", forca: 92 },
+  { nome: "Manchester City", liga: "Europa", forca: 94 },
+  { nome: "PSG", liga: "Europa", forca: 90 },
+  { nome: "Al Hilal", liga: "Arabia", forca: 82 },
+  { nome: "Al Nassr", liga: "Arabia", forca: 80 },
+  { nome: "LA Galaxy", liga: "MLS", forca: 75 },
+  { nome: "Shanghai Port", liga: "China", forca: 78 },
+  { nome: "Kawasaki Frontale", liga: "Japão", forca: 79 }
+];
+
+// =============================
+// JOGADOR
+// =============================
+
 let player = {
-  nome: "Novo Jogador",
+  nome: "Novo Talento",
   idade: 18,
-  clube: "Clube da Base",
-  liga: "Brasil",
-  status: "Jovem da Base",
+  clube: clubes[0],
+  status: "Base",
+  contrato: 3,
+  valor: 5,
   atributos: {
     tecnico: 65,
     fisico: 70,
     mental: 60
-  },
-  temporada: {
-    partidas: 0,
-    gols: 0,
-    assistencias: 0
   },
   total: {
     partidas: 0,
@@ -22,109 +41,156 @@ let player = {
   }
 };
 
-function atualizarTela() {
-  document.getElementById("playerInfo").innerHTML = `
-    <strong>${player.nome}</strong><br>
-    Idade: ${player.idade}<br>
-    Clube: ${player.clube}<br>
-    Status: ${player.status}
-  `;
-}
+// =============================
+// SISTEMA DE TEMPORADA
+// =============================
 
-function passarAno() {
+function passarAno(){
 
-  if(player.idade >= 70){
-    document.getElementById("output").innerHTML =
-      "🏁 O jogador se aposentou automaticamente aos 70 anos!";
+  if(player.idade >= 40){
+    output("🏁 O jogador se aposentou!");
     return;
   }
 
-  let desempenho = Math.random() * player.atributos.tecnico;
+  let desempenho = (player.atributos.tecnico + player.atributos.mental) / 2;
+  let chanceTitulo = (player.clube.forca + desempenho) / 2;
 
-  player.temporada.partidas = Math.floor(Math.random() * 50);
-  player.temporada.gols = Math.floor(desempenho / 10);
-  player.temporada.assistencias = Math.floor(Math.random() * 10);
+  let partidas = Math.floor(Math.random() * 50) + 10;
+  let gols = Math.floor((desempenho / 10) + Math.random()*5);
+  let assist = Math.floor(Math.random() * 10);
 
-  player.total.partidas += player.temporada.partidas;
-  player.total.gols += player.temporada.gols;
-  player.total.assistencias += player.temporada.assistencias;
+  player.total.partidas += partidas;
+  player.total.gols += gols;
+  player.total.assistencias += assist;
 
-  if(desempenho > 60){
-    player.total.titulos += 1;
+  if(Math.random() * 100 < chanceTitulo/2){
+    player.total.titulos++;
   }
 
-  player.idade++;
-
+  evoluir();
+  declinio();
   ajustarStatus();
-  ajustarDeclinio();
 
-  document.getElementById("output").innerHTML = `
-    📅 Temporada concluída! <br><br>
-    Partidas: ${player.temporada.partidas}<br>
-    Gols: ${player.temporada.gols}<br>
-    Assistências: ${player.temporada.assistencias}<br>
+  player.idade++;
+  player.contrato--;
+
+  if(player.contrato <= 0){
+    mercado();
+  }
+
+  salvarAuto();
+
+  output(`
+    📅 Temporada Finalizada<br><br>
+    Clube: ${player.clube.nome}<br>
+    Partidas: ${partidas}<br>
+    Gols: ${gols}<br>
+    Assistências: ${assist}<br>
     Títulos na carreira: ${player.total.titulos}
-  `;
+  `);
 
   atualizarTela();
 }
 
-function ajustarStatus(){
-  if(player.total.gols > 200){
-    player.status = "Lenda";
-  } else if(player.total.gols > 100){
-    player.status = "Ícone";
-  } else if(player.total.gols > 50){
-    player.status = "Superestrela";
+// =============================
+// EVOLUÇÃO
+// =============================
+
+function evoluir(){
+  if(player.idade <= 28){
+    player.atributos.tecnico += 2;
+    player.atributos.fisico += 2;
+    player.valor += 3;
   }
 }
 
-function ajustarDeclinio(){
-  if(player.idade > 35){
+function declinio(){
+  if(player.idade > 33){
     player.atributos.fisico -= 2;
-  }
-  if(player.idade > 40){
-    player.atributos.fisico -= 3;
+    player.valor -= 2;
   }
 }
+
+// =============================
+// STATUS
+// =============================
+
+function ajustarStatus(){
+  if(player.total.gols > 300) player.status = "Lenda";
+  else if(player.total.gols > 200) player.status = "Ídolo";
+  else if(player.total.gols > 100) player.status = "Estrela";
+  else if(player.total.gols > 50) player.status = "Titular";
+  else if(player.total.gols > 20) player.status = "Promessa";
+}
+
+// =============================
+// MERCADO
+// =============================
 
 function mercado(){
 
   let ofertas = [];
 
+  clubes.forEach(clube => {
+    if(clube.forca >= player.clube.forca - 5){
+      let valorOferta = Math.floor(player.valor + Math.random()*10);
+      ofertas.push(`${clube.nome} oferece €${valorOferta}M`);
+    }
+  });
+
   if(player.idade >= 35){
-    ofertas.push("Proposta da Saudi Pro League");
-    ofertas.push("Proposta da MLS");
-  } else {
-    ofertas.push("Proposta de clube europeu médio");
+    ofertas.push("Oferta da MLS");
+    ofertas.push("Oferta da Arabia Saudita");
   }
 
-  document.getElementById("output").innerHTML =
-    "💼 Ofertas recebidas:<br><br>" + ofertas.join("<br>");
+  output("💼 Ofertas:<br><br>" + ofertas.join("<br>"));
+}
+
+// =============================
+// UTILIDADES
+// =============================
+
+function atualizarTela(){
+  document.getElementById("playerInfo").innerHTML = `
+    <strong>${player.nome}</strong><br>
+    Idade: ${player.idade}<br>
+    Clube: ${player.clube.nome} (${player.clube.liga})<br>
+    Status: ${player.status}<br>
+    Valor: €${player.valor}M<br>
+    Contrato: ${player.contrato} anos
+  `;
 }
 
 function verEstatisticas(){
-  document.getElementById("output").innerHTML = `
-    📊 Estatísticas Totais<br><br>
+  output(`
+    📊 Carreira<br><br>
     Partidas: ${player.total.partidas}<br>
     Gols: ${player.total.gols}<br>
     Assistências: ${player.total.assistencias}<br>
     Títulos: ${player.total.titulos}
-  `;
+  `);
 }
 
 function salvar(){
-  localStorage.setItem("savePlayer", JSON.stringify(player));
+  localStorage.setItem("saveV2", JSON.stringify(player));
   alert("Jogo salvo!");
 }
 
 function carregar(){
-  let save = localStorage.getItem("savePlayer");
+  let save = localStorage.getItem("saveV2");
   if(save){
     player = JSON.parse(save);
     atualizarTela();
     alert("Save carregado!");
   }
+}
+
+function salvarAuto(){
+  localStorage.setItem("saveV2", JSON.stringify(player));
+}
+
+function output(texto){
+  document.getElementById("output").innerHTML = texto;
 }
 
 atualizarTela();
