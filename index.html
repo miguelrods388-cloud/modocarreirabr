@@ -7,20 +7,28 @@
 </head>
 <body>
 
-<div class="container">
-  <h1>🌍 Simulador Global de Carreira</h1>
+<div class="app">
 
-  <div id="playerInfo"></div>
+  <header>
+    <h1>🌍 Global Career Simulator</h1>
+  </header>
 
-  <div class="buttons">
-    <button onclick="passarAno()">▶️ Passar Ano</button>
-    <button onclick="mercado()">💼 Mercado</button>
-    <button onclick="verEstatisticas()">📊 Estatísticas</button>
-    <button onclick="salvar()">💾 Salvar</button>
-    <button onclick="carregar()">📂 Carregar</button>
+  <div class="dashboard">
+
+    <div class="card" id="playerCard"></div>
+
+    <div class="controls">
+      <button onclick="passarAno()">▶️ Passar Temporada</button>
+      <button onclick="mercado()">💼 Mercado</button>
+      <button onclick="verEstatisticas()">📊 Estatísticas</button>
+      <button onclick="salvar()">💾 Salvar</button>
+      <button onclick="carregar()">📂 Carregar</button>
+    </div>
+
+    <div class="card" id="output"></div>
+
   </div>
 
-  <div id="output"></div>
 </div>
 
 <script src="game.js"></script>
